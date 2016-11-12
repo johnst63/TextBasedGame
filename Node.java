@@ -10,6 +10,7 @@ public class Node {
     private ArrayList<Node> children; //the situations/nodes that can be reached from the node's given choices
     private ArrayList<String> choices;
     private int id;
+    private boolean readFrom = false; //whether or not the file has already been parsed
 
     public Node(File text, int id) {
         this.text = text;
@@ -19,60 +20,65 @@ public class Node {
     }
 
     public void parseFile() throws FileNotFoundException {
-        Scanner reader = new Scanner(text);
-        int numChoices = reader.nextInt();
-        reader.nextLine();
-        String str;
+        if(!readFrom) {
+            Scanner reader = new Scanner(text);
+            int numChoices = reader.nextInt();
+            reader.nextLine();
+            String str;
 
-        for(int i = 0; i < numChoices; i++) {
-            str = reader.nextLine();
-            choices.add(str);
-        }
-
-        while(reader.hasNext() && (str = reader.nextLine()).contains("@nodes@") != true) {
-
-        }
-        str = reader.nextLine();
-        String fileName;
-        for(int i = 0; i < numChoices; i++) {
-            fileName = Driver.NODE_TEXT_FOLDER;
-            fileName += reader.nextLine();
-            fileName += ".txt";
-            File textfile = new File(fileName);
-            children.add(new Node(textfile, Driver.node_counter));
-            Driver.node_counter++;
-        }
-
-        boolean print = false;
-        while(reader.hasNext()) {
-            str = reader.nextLine();
-            if(print)
-                System.out.println(str);
-            if(str.contains("@desc@")) {
-                print = true;
+            for (int i = 0; i < numChoices; i++) {
+                str = reader.nextLine();
+                choices.add(str);
             }
-        }
-        reader.close();
 
+            while (reader.hasNext() && (str = reader.nextLine()).contains("@nodes@") != true) {
+
+            }
+            //str = reader.nextLine();
+            String fileName;
+            for (int i = 0; i < numChoices; i++) {
+                fileName = Driver.NODE_TEXT_FOLDER;
+                fileName += reader.nextLine();
+                fileName += ".txt";
+                File textfile = new File(fileName);
+                children.add(new Node(textfile, Driver.node_counter));
+                Driver.node_counter++;
+            }
+
+            boolean print = false;
+            while (reader.hasNext()) {
+                str = reader.nextLine();
+                if(print && str.contains("@endd@")) {
+                    print = false;
+                }
+                if (print) {
+                    System.out.println(str);
+
+                }
+                if (str.contains("@desc@")) {
+                    print = true;
+                }
+            }
+            reader.close();
+
+            printOptions();
+            readFrom = true;
+        }
     }
     /**
      * print out the possible options for the player
      * @throws FileNotFoundException
      */
     public void printOptions() throws FileNotFoundException {
-        //BufferedReader reader = new BufferedReader(new FileReader(text));
-        Scanner reader = new Scanner(text);
-        String str;
-        int numChoices = reader.nextInt();
-        reader.nextLine();
-
-        for(int i = 0; i < numChoices; i++) {
-            str = reader.nextLine();
-            System.out.println((i + 1) + ": " + str);
+        int i = 1;
+        for(String choice: choices) {
+            System.out.println(i++ + ": " + choice);
         }
-        reader.close();
     }
 
+    public Node getChild(int index) {
+        return children.get(index);
+    }
 
 
     public void printText() throws IOException {
@@ -80,12 +86,17 @@ public class Node {
         String str;
         boolean print = false;
         while((str = reader.readLine()) != null) {
-            if(print)
+            if(print) {
                 System.out.println(str);
+                if(str.contains("@")) {
+                    print = false;
+                }
+            }
             if(str.contains("@desc@")) {
                 print = true;
             }
         }
         reader.close();
     }
+
 }

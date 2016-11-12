@@ -26,6 +26,7 @@ public class Driver {
 
             }
             input = userInput.nextInt();
+            curNode = curNode.getChild(input-1); //-1 to account for conversion from user numbers to array position
 
         }
     }
