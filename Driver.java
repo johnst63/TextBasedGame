@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -9,6 +10,7 @@ public class Driver {
 
     public static final String NODE_TEXT_FOLDER = "node_textfiles/";
     public static int node_counter = 0;
+    public static ArrayList<Node> allNodes = new ArrayList<Node>();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -16,7 +18,6 @@ public class Driver {
         Node curNode = start;
 
         Scanner userInput = new Scanner(System.in);
-        //String input = "";
         int input = 0;
 
         while(running) {

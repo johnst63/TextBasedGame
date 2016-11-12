@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
+ *
  * Created by Sheolfire on 11/11/2016.
  */
 public class Node {
@@ -19,6 +20,10 @@ public class Node {
         children = new ArrayList<Node>();
     }
 
+    /**
+     * This method is responsible for parsing the text file of the node, obtaining the user's choices, the nodes the choices will branch to, and the description of the room
+     * @throws FileNotFoundException
+     */
     public void parseFile() throws FileNotFoundException {
         if(!readFrom) {
             Scanner reader = new Scanner(text);
@@ -34,7 +39,7 @@ public class Node {
             while (reader.hasNext() && (str = reader.nextLine()).contains("@nodes@") != true) {
 
             }
-            //str = reader.nextLine();
+
             String fileName;
             for (int i = 0; i < numChoices; i++) {
                 fileName = Driver.NODE_TEXT_FOLDER;
