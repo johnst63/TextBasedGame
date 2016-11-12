@@ -24,7 +24,7 @@ public class Node {
      * This method is responsible for parsing the text file of the node, obtaining the user's choices, the nodes the choices will branch to, and the description of the room
      * @throws FileNotFoundException
      */
-    public void parseFile() throws FileNotFoundException {
+    public void parseFile() throws IOException {
         if(!readFrom) {
             Scanner reader = new Scanner(text);
             int numChoices = reader.nextInt();
@@ -43,11 +43,21 @@ public class Node {
             String fileName;
             for (int i = 0; i < numChoices; i++) {
                 fileName = Driver.NODE_TEXT_FOLDER;
-                fileName += reader.nextLine();
-                fileName += ".txt";
-                File textfile = new File(fileName);
-                children.add(new Node(textfile, Driver.node_counter));
-                Driver.node_counter++;
+                String fileNameLocal = reader.nextLine(); //the filename excluding the Node_Text_Folder extension
+                fileNameLocal += ".txt";
+                fileName += fileNameLocal;
+
+                //check if fileName exists already in a node the masterlist of nodes and if so, add that node instead
+                Node masterListNode = Driver.fileNameInNodeList(fileNameLocal);
+                if(masterListNode == null) {
+                    File textfile = new File(fileName);
+                    Node newNode = new Node(textfile, Driver.node_counter);
+                    children.add(newNode);
+                    Driver.nodeMasterList.add(newNode);
+                    Driver.node_counter++;
+                } else {
+                    children.add(masterListNode);
+                }
             }
 
             boolean print = false;
@@ -68,6 +78,9 @@ public class Node {
 
             printOptions();
             readFrom = true;
+        } else {
+            printText();
+            printOptions();
         }
     }
     /**
@@ -87,21 +100,26 @@ public class Node {
 
 
     public void printText() throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(text));
+        Scanner reader = new Scanner(text);
         String str;
         boolean print = false;
-        while((str = reader.readLine()) != null) {
-            if(print) {
-                System.out.println(str);
-                if(str.contains("@")) {
-                    print = false;
-                }
+        while(reader.hasNext()) {
+            str = reader.nextLine();
+            if(print && str.contains("@endd@")) {
+                print = false;
             }
-            if(str.contains("@desc@")) {
+            if (print) {
+                System.out.println(str);
+
+            }
+            if (str.contains("@desc@")) {
                 print = true;
             }
         }
         reader.close();
     }
 
+    public File getTextFile() {
+        return text;
+    }
 }
